@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SchoolHub — Modern School Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #050e2b;
+  --navy2: #0a1640;
+  --blue: #2563eb;
+  --blue-bright: #3b82f6;
+  --blue-glow: rgba(59,130,246,0.35);
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --white: #ffffff;
+  --off-white: #f0f4ff;
+  --muted: #94a3b8;
+  --border-dark: rgba(255,255,255,0.08);
+  --border-light: #e2e8f0;
+  --text-dark: #0f172a;
+  --card-bg: rgba(255,255,255,0.04);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: #fff; color: var(--text-dark); overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+.d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 64px; height: 68px;
+  background: rgba(5,14,43,.88); backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border-dark); transition: background .3s;
+}
+nav.scrolled { background: rgba(5,14,43,.98); box-shadow: 0 4px 32px rgba(0,0,0,.5); }
+.logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: -.5px; }
+.logo span { color: var(--blue-bright); }
+.nav-links { display: flex; gap: 30px; }
+.nav-links a { font-size: .875rem; font-weight: 500; color: rgba(255,255,255,.6); transition: color .2s; }
+.nav-links a:hover { color: #fff; }
+.nav-actions { display: flex; gap: 10px; }
+.btn-ghost { padding: 9px 20px; border-radius: 8px; font-size: .875rem; font-weight: 500; color: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.14); background: transparent; cursor: pointer; transition: all .2s; }
+.btn-ghost:hover { border-color: rgba(255,255,255,.35); color: #fff; }
+.btn-cta { padding: 9px 22px; border-radius: 8px; font-size: .875rem; font-weight: 600; background: var(--blue); color: #fff; border: none; cursor: pointer; transition: all .2s; }
+.btn-cta:hover { background: #1d4ed8; box-shadow: 0 0 20px var(--blue-glow); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; background: var(--navy);
+  display: flex; align-items: center; padding: 110px 64px 80px; gap: 56px;
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 75% 65% at 72% 52%, rgba(37,99,235,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 45% at 18% 82%, rgba(6,182,212,.1) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 35% at 85% 12%, rgba(59,130,246,.1) 0%, transparent 55%);
+}
+.hero-grid-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 20%, transparent 90%);
+}
+.hero-orb { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.orb1 { width: 480px; height: 480px; right: 8%; top: 8%; background: rgba(37,99,235,.13); }
+.orb2 { width: 280px; height: 280px; left: 4%; bottom: 8%; background: rgba(6,182,212,.08); }
+
+.hero-left { flex: 1; max-width: 560px; position: relative; z-index: 1; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(59,130,246,.11); border: 1px solid rgba(59,130,246,.28);
+  padding: 6px 14px; border-radius: 99px; margin-bottom: 26px;
+}
+.eyebrow .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: blink 2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.eyebrow span { font-size: .75rem; font-weight: 600; color: var(--blue-bright); letter-spacing: .8px; text-transform: uppercase; }
+.hero h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.4rem, 4.2vw, 3.5rem); font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 22px; }
+.hero h1 .hl { background: linear-gradient(130deg, #60a5fa 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: 1rem; color: rgba(255,255,255,.58); line-height: 1.78; margin-bottom: 38px; max-width: 450px; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-hero-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: 10px; font-size: .925rem; font-weight: 600;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: #fff;
+  border: none; cursor: pointer; transition: all .25s;
+  box-shadow: 0 4px 18px rgba(37,99,235,.42);
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,.52); }
+.btn-hero-sec {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: 10px; font-size: .925rem; font-weight: 500;
+  background: rgba(255,255,255,.07); color: rgba(255,255,255,.88);
+  border: 1px solid rgba(255,255,255,.14); cursor: pointer; transition: all .25s;
+}
+.btn-hero-sec:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.28); }
+.trust { display: flex; align-items: center; gap: 12px; margin-top: 30px; }
+.avatars { display: flex; }
+.avatars div { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--navy); background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%); display: flex; align-items: center; justify-content: center; font-size: .68rem; font-weight: 700; color: #fff; margin-left: -8px; }
+.avatars div:first-child { margin-left: 0; }
+.trust p { font-size: .82rem; color: rgba(255,255,255,.45); }
+.trust p strong { color: rgba(255,255,255,.88); }
+
+.hero-right { flex: 1; position: relative; z-index: 1; display: flex; justify-content: flex-end; }
+.dash-shell {
+  width: 100%; max-width: 510px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 22px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+}
+.dash-bar { background: rgba(255,255,255,.05); padding: 13px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.dots { display: flex; gap: 6px; }
+.dots span { width: 10px; height: 10px; border-radius: 50%; }
+.dots span:nth-child(1){background:#ff5f57} .dots span:nth-child(2){background:#febc2e} .dots span:nth-child(3){background:#28c840}
+.dash-bar-title { font-size: .78rem; color: rgba(255,255,255,.38); margin-left: 4px; }
+.dash-body { padding: 18px; }
+.d-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.d-stat { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 13px 11px; }
+.d-stat .v { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 700; color: #fff; }
+.d-stat .l { font-size: .67rem; color: rgba(255,255,255,.38); margin-top: 2px; }
+.d-stat .c { font-size: .67rem; color: var(--green); margin-top: 3px; }
+.d-chart { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.d-chart-lbl { font-size: .73rem; font-weight: 600; color: rgba(255,255,255,.45); margin-bottom: 12px; }
+.chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 60px; }
+.cb { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.cb-bar { width: 100%; border-radius: 3px 3px 0 0; background: rgba(59,130,246,.28); }
+.cb-bar.hi { background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%); box-shadow: 0 0 10px rgba(96,165,250,.4); }
+.cb-lbl { font-size: .58rem; color: rgba(255,255,255,.28); }
+.d-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.d-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: 13px; }
+.d-card-title { font-size: .7rem; font-weight: 600; color: rgba(255,255,255,.45); margin-bottom: 9px; }
+.act-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; }
+.act-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.act-row span { font-size: .7rem; color: rgba(255,255,255,.48); }
+.pr { margin-bottom: 8px; }
+.pr-head { display: flex; justify-content: space-between; font-size: .68rem; color: rgba(255,255,255,.4); margin-bottom: 4px; }
+.pr-bar { height: 5px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+.pr-fill { height: 100%; border-radius: 99px; }
+
+/* ── MARQUEE ── */
+.marquee-strip { background: #f7f9ff; border-top: 1px solid #eaedfa; border-bottom: 1px solid #eaedfa; padding: 22px 0; overflow: hidden; }
+.marquee-inner { display: flex; gap: 56px; animation: scroll 22s linear infinite; width: max-content; }
+.marquee-strip:hover .marquee-inner { animation-play-state: paused; }
+@keyframes scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.m-item { font-family: 'Bricolage Grotesque', sans-serif; font-size: .875rem; font-weight: 700; color: #b0bcd4; white-space: nowrap; }
+
+/* ── SECTION COMMON ── */
+.s-tag { display: inline-flex; align-items: center; gap: 8px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.8px; color: var(--blue); margin-bottom: 14px; }
+.s-tag::before { content:''; width: 18px; height: 2px; background: var(--blue); border-radius: 2px; }
+h2.s-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.8rem, 2.8vw, 2.5rem); font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.s-sub { font-size: .975rem; color: #64748b; line-height: 1.78; max-width: 510px; }
+.tc { text-align: center; }
+.tc .s-sub { margin: 0 auto; }
+
+/* ── CHALLENGES ── */
+.challenges { padding: 96px 64px; }
+.ch-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-top: 52px; }
+.ch-card { padding: 30px; border-radius: 20px; border: 1.5px solid #e6edf8; transition: all .3s; position: relative; overflow: hidden; }
+.ch-card::after { content:''; position: absolute; inset: 0; border-radius: 20px; background: linear-gradient(135deg, rgba(37,99,235,.04) 0%, transparent 55%); opacity: 0; transition: opacity .3s; }
+.ch-card:hover { border-color: rgba(37,99,235,.28); transform: translateY(-4px); box-shadow: 0 14px 36px rgba(37,99,235,.08); }
+.ch-card:hover::after { opacity: 1; }
+.ch-ico { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 18px; }
+.ch-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 9px; }
+.ch-card p { font-size: .86rem; color: #64748b; line-height: 1.72; }
+
+/* ── SOLVE ── */
+.solve-wrap { padding: 0 64px 96px; }
+.solve-box {
+  border-radius: 26px; overflow: hidden;
+  background: linear-gradient(135deg, var(--navy) 0%, #0c1e55 55%, #0f2464 100%);
+  padding: 68px 70px; display: flex; align-items: center; gap: 56px;
+  position: relative;
+}
+.solve-box::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 80% at 82% 50%, rgba(37,99,235,.22) 0%, transparent 60%); pointer-events: none; }
+.solve-box-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 38px 38px; }
+.solve-txt { flex: 1; position: relative; z-index: 1; }
+.solve-pill { display: inline-block; background: rgba(59,130,246,.14); border: 1px solid rgba(59,130,246,.3); color: #93c5fd; font-size: .72rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 12px; border-radius: 99px; margin-bottom: 18px; }
+.solve-txt h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.55rem, 2.3vw, 2.1rem); font-weight: 800; color: #fff; line-height: 1.22; margin-bottom: 14px; letter-spacing: -.5px; }
+.solve-txt h2 em { color: #93c5fd; font-style: normal; }
+.solve-txt p { color: rgba(255,255,255,.58); font-size: .93rem; line-height: 1.72; margin-bottom: 30px; max-width: 400px; }
+.btn-w { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px; font-size: .88rem; font-weight: 600; background: #fff; color: var(--blue); border: none; cursor: pointer; transition: all .25s; }
+.btn-w:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.22); }
+.solve-widget-wrap { flex-shrink: 0; width: 296px; position: relative; z-index: 1; }
+.sw { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 20px; backdrop-filter: blur(12px); }
+.sw-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sw-title { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.65); }
+.sw-live { background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.28); color: #6ee7b7; font-size: .67rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+.sw-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.sw-row:last-child { border-bottom: none; }
+.sw-ico { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .88rem; flex-shrink: 0; }
+.sw-info { flex: 1; }
+.sw-info .sn { font-size: .77rem; color: rgba(255,255,255,.78); font-weight: 500; }
+.sw-info .ss { font-size: .67rem; color: rgba(255,255,255,.38); }
+.sw-tag { font-size: .63rem; font-weight: 700; padding: 3px 8px; border-radius: 99px; }
+
+/* ── WHY ── */
+.why { padding: 96px 64px; background: #f7f9ff; }
+.why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-top: 52px; }
+.why-card { background: #fff; border-radius: 20px; padding: 30px 22px; border: 1.5px solid #e6edf8; text-align: center; transition: all .3s; }
+.why-card:hover { border-color: rgba(37,99,235,.28); box-shadow: 0 10px 30px rgba(37,99,235,.08); transform: translateY(-3px); }
+.why-ico { width: 58px; height: 58px; border-radius: 18px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; font-size: 1.55rem; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; }
+.why-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: .975rem; margin-bottom: 9px; }
+.why-card p { font-size: .835rem; color: #64748b; line-height: 1.65; }
+
+/* ── WHO ── */
+.who { padding: 96px 64px; background: #fff; }
+.who-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-top: 52px; }
+.who-card { border-radius: 22px; padding: 34px 30px; border: 1.5px solid #e6edf8; transition: all .3s; position: relative; overflow: hidden; }
+.wca { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue) 0%, var(--cyan) 100%); transform: scaleX(0); transform-origin: left; transition: transform .32s; }
+.who-card:hover .wca { transform: scaleX(1); }
+.who-card:hover { border-color: rgba(37,99,235,.22); box-shadow: 0 10px 38px rgba(37,99,235,.07); }
+.who-ico { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 16px; }
+.who-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1rem; color: var(--blue); margin-bottom: 4px; }
+.who-role { font-size: .76rem; color: #94a3b8; margin-bottom: 18px; }
+.who-ul { list-style: none; }
+.who-ul li { font-size: .86rem; color: #475569; padding: 7px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 9px; }
+.who-ul li:last-child { border-bottom: none; }
+.ck { width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%); display: flex; align-items: center; justify-content: center; font-size: .58rem; color: #fff; flex-shrink: 0; }
+
+/* ── FEATURES ── */
+.features { padding: 96px 64px; background: var(--navy); position: relative; overflow: hidden; }
+.feat-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(37,99,235,.11) 0%, transparent 60%); pointer-events: none; }
+.feat-grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.024) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.024) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.features .s-tag { color: #93c5fd; }
+.features .s-tag::before { background: #93c5fd; }
+.features h2.s-title { color: #fff; }
+.features .s-sub { color: rgba(255,255,255,.52); }
+.feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 52px; position: relative; z-index: 1; }
+.f-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 18px; padding: 28px; transition: all .3s; }
+.f-card:hover { background: rgba(255,255,255,.07); border-color: rgba(59,130,246,.28); transform: translateY(-3px); box-shadow: 0 14px 38px rgba(0,0,0,.3); }
+.f-ico { width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 16px; background: rgba(37,99,235,.18); border: 1px solid rgba(37,99,235,.28); }
+.f-card h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: .975rem; color: #fff; margin-bottom: 9px; }
+.f-card p { font-size: .835rem; color: rgba(255,255,255,.48); line-height: 1.65; }
+
+/* ── HOW ── */
+.how { padding: 96px 64px; background: #fff; }
+.how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 36px; margin-top: 60px; position: relative; }
+.how-grid::before { content:''; position: absolute; top: 34px; left: calc(16.6% + 34px); right: calc(16.6% + 34px); height: 2px; background: linear-gradient(90deg, var(--blue) 0%, var(--cyan) 100%); opacity: .22; }
+.how-step { text-align: center; }
+.step-n { width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 22px; background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%); display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 800; color: #fff; box-shadow: 0 8px 22px rgba(37,99,235,.34), 0 0 0 8px rgba(37,99,235,.07); position: relative; z-index: 1; }
+.how-step h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; }
+.how-step p { font-size: .875rem; color: #64748b; line-height: 1.72; max-width: 230px; margin: 0 auto; }
+
+/* ── PRICING ── */
+.pricing { padding: 96px 64px; background: #f7f9ff; }
+.p-toggle { display: flex; justify-content: center; margin-bottom: 48px; }
+.p-toggle-wrap { display: flex; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 99px; padding: 4px; }
+.p-opt { padding: 8px 22px; border-radius: 99px; font-size: .875rem; font-weight: 600; cursor: pointer; color: #64748b; transition: all .2s; }
+.p-opt.on { background: var(--blue); color: #fff; box-shadow: 0 4px 10px rgba(37,99,235,.28); }
+.save-tag { display: inline-block; background: #dcfce7; color: #15803d; font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-left: 5px; }
+.p-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; max-width: 880px; margin: 0 auto; }
+.p-card { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 22px; padding: 34px 28px; position: relative; cursor: pointer; transition: all .28s; }
+.p-card:hover { border-color: var(--blue); box-shadow: 0 12px 36px rgba(37,99,235,.11); transform: translateY(-3px); }
+.p-card:hover .p-badge { display: block; }
+.p-card:hover .p-btn { background: var(--blue); color: #fff; border-color: var(--blue); }
+.p-card.sel { border-color: var(--blue); box-shadow: 0 16px 48px rgba(37,99,235,.14); transform: translateY(-5px); }
+.p-card.sel .p-badge { display: block; }
+.p-card.sel .p-btn { background: var(--blue); color: #fff; border-color: var(--blue); }
+.p-badge { display: none; position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--blue) 0%, #06b6d4 100%); color: #fff; font-size: .7rem; font-weight: 700; padding: 4px 16px; border-radius: 99px; white-space: nowrap; box-shadow: 0 4px 10px rgba(37,99,235,.3); }
+.p-tier { font-size: .76rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 9px; }
+.p-price { display: flex; align-items: flex-end; gap: 3px; margin-bottom: 6px; }
+.p-amt { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.7rem; font-weight: 800; color: var(--text-dark); letter-spacing: -2px; }
+.p-per { color: #94a3b8; font-size: .84rem; padding-bottom: 7px; }
+.p-desc { font-size: .83rem; color: #64748b; margin-bottom: 22px; line-height: 1.5; }
+.p-div { height: 1px; background: #f1f5f9; margin-bottom: 18px; }
+.p-list { list-style: none; margin-bottom: 26px; }
+.p-list li { font-size: .84rem; color: #475569; padding: 6px 0; display: flex; align-items: center; gap: 9px; }
+.p-list li .gc { color: var(--green); font-weight: 700; }
+.p-btn { width: 100%; padding: 12px; border-radius: 9px; font-size: .88rem; font-weight: 600; border: 1.5px solid #e2e8f0; background: transparent; color: #64748b; cursor: pointer; transition: all .2s; display: block; text-align: center; }
+
+/* ── TRIAL BANNER ── */
+.trial-wrap { padding: 0 64px 96px; }
+.trial-box { background: linear-gradient(135deg, #040d26 0%, #081440 50%, #050e2b 100%); border-radius: 26px; padding: 62px 70px; text-align: center; position: relative; overflow: hidden; }
+.trial-box::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 50% 110%, rgba(37,99,235,.22) 0%, transparent 60%); pointer-events: none; }
+.trial-box h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.9rem; font-weight: 800; color: #fff; margin-bottom: 10px; position: relative; }
+.trial-box p { color: rgba(255,255,255,.55); font-size: .93rem; margin-bottom: 34px; position: relative; }
+.trial-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; position: relative; }
+.trial-perks { display: flex; justify-content: center; gap: 36px; margin-top: 30px; position: relative; flex-wrap: wrap; }
+.tp { display: flex; align-items: center; gap: 7px; font-size: .83rem; color: rgba(255,255,255,.5); }
+.tp .tpck { color: var(--green); font-weight: 700; }
+
+/* ── STATS ── */
+.stats { padding: 96px 64px; background: var(--navy); position: relative; overflow: hidden; }
+.stats::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse 65% 65% at 50% 50%, rgba(37,99,235,.09) 0%, transparent 60%); pointer-events: none; }
+.stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-top: 52px; position: relative; }
+.stat-c { padding: 44px 36px; text-align: center; background: rgba(255,255,255,.028); border: 1px solid rgba(255,255,255,.055); }
+.stat-c:first-child { border-radius: 18px 0 0 18px; }
+.stat-c:last-child { border-radius: 0 18px 18px 0; }
+.stat-n { font-family: 'Bricolage Grotesque', sans-serif; font-size: 3.4rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,.55) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stat-l { font-size: .875rem; color: rgba(255,255,255,.38); margin-top: 5px; }
+
+/* ── TESTIMONIALS ── */
+.testimonials { padding: 96px 64px; background: #fff; }
+.t-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; margin-top: 52px; }
+.t-card { background: #f7f9ff; border: 1.5px solid #e6edf8; border-radius: 20px; padding: 28px; transition: all .3s; }
+.t-card:hover { border-color: rgba(37,99,235,.18); box-shadow: 0 8px 28px rgba(37,99,235,.07); }
+.t-stars { display: flex; gap: 3px; margin-bottom: 14px; font-size: .95rem; }
+.t-card blockquote { font-size: .88rem; color: #334155; line-height: 1.78; margin-bottom: 18px; font-style: italic; }
+.t-author { display: flex; align-items: center; gap: 11px; }
+.t-av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .82rem; color: #fff; flex-shrink: 0; }
+.t-name { font-weight: 700; font-size: .84rem; color: #0f172a; }
+.t-role { font-size: .73rem; color: #94a3b8; }
+
+/* ── BUILT FOR ── */
+.built { padding: 96px 64px; background: #f7f9ff; }
+.built-inner { display: flex; align-items: center; gap: 72px; }
+.built-left { flex: 1; }
+.b-feats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 32px; }
+.b-feat { display: flex; gap: 12px; align-items: flex-start; }
+.b-ico { width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+.b-txt h4 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: .875rem; margin-bottom: 3px; }
+.b-txt p { font-size: .8rem; color: #64748b; line-height: 1.6; }
+.built-right { flex: 1; }
+.b-screen { background: var(--navy); border-radius: 18px; padding: 20px; box-shadow: 0 28px 64px rgba(5,14,43,.22), 0 0 0 1px rgba(255,255,255,.04); }
+.b-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.b-stat { flex: 1; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 12px; }
+.b-stat .bv { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; font-weight: 700; color: #fff; }
+.b-stat .bl { font-size: .66rem; color: rgba(255,255,255,.36); }
+.b-stat .bc { font-size: .66rem; color: var(--green); }
+.b-prog-sec { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; padding: 14px; }
+.b-prog-title { font-size: .7rem; color: rgba(255,255,255,.45); font-weight: 600; margin-bottom: 10px; }
+.bpr { margin-bottom: 8px; }
+.bpr:last-child { margin-bottom: 0; }
+.bpr-head { display: flex; justify-content: space-between; font-size: .68rem; color: rgba(255,255,255,.42); margin-bottom: 4px; }
+.bpr-bar { height: 5px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+.bpr-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue) 0%, var(--cyan) 100%); }
+
+/* ── SECURITY ── */
+.security { padding: 96px 64px; background: #fff; }
+.sec-inner { display: flex; align-items: center; gap: 72px; }
+.sec-vis { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sec-c { background: #f7f9ff; border: 1.5px solid #e6edf8; border-radius: 16px; padding: 22px; transition: all .3s; }
+.sec-c:hover { border-color: rgba(37,99,235,.22); box-shadow: 0 7px 22px rgba(37,99,235,.07); }
+.sec-c-ico { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; margin-bottom: 12px; }
+.sec-c h4 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: .875rem; margin-bottom: 5px; }
+.sec-c p { font-size: .79rem; color: #64748b; line-height: 1.6; }
+.sec-txt { flex: 1; }
+.sec-list { list-style: none; margin-top: 26px; }
+.sec-list li { display: flex; align-items: center; gap: 11px; font-size: .875rem; color: #475569; padding: 9px 0; border-bottom: 1px solid #f1f5f9; }
+.sec-list li:last-child { border-bottom: none; }
+.sec-li-ico { width: 27px; height: 27px; border-radius: 7px; background: linear-gradient(135deg, #eff6ff, #dbeafe); display: flex; align-items: center; justify-content: center; font-size: .78rem; flex-shrink: 0; }
+.btn-blue { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px; padding: 12px 24px; border-radius: 10px; font-size: .88rem; font-weight: 600; background: var(--blue); color: #fff; border: none; cursor: pointer; transition: all .25s; box-shadow: 0 4px 12px rgba(37,99,235,.28); }
+.btn-blue:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 7px 22px rgba(37,99,235,.38); }
+
+/* ── FAQ ── */
+.faq { padding: 96px 64px; background: #f7f9ff; }
+.faq-list { max-width: 720px; margin: 52px auto 0; }
+.faq-item { border-bottom: 1px solid #e2e8f0; }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; cursor: pointer; font-weight: 600; font-size: .92rem; color: #0f172a; transition: color .2s; }
+.faq-q:hover { color: var(--blue); }
+.faq-ico { width: 27px; height: 27px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #64748b; transition: all .22s; flex-shrink: 0; }
+.faq-item.open .faq-ico { background: var(--blue); color: #fff; transform: rotate(45deg); }
+.faq-ans { display: none; font-size: .875rem; color: #64748b; line-height: 1.8; padding-bottom: 18px; }
+.faq-item.open .faq-ans { display: block; }
+
+/* ── FINAL CTA ── */
+.final { background: linear-gradient(135deg, #040d26 0%, #0c1e55 50%, #040d26 100%); padding: 96px 64px; text-align: center; position: relative; overflow: hidden; }
+.final::before { content:''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 50% 100%, rgba(37,99,235,.24) 0%, transparent 60%); pointer-events: none; }
+.final h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2rem, 3.2vw, 2.9rem); font-weight: 800; color: #fff; margin-bottom: 14px; letter-spacing: -1px; position: relative; }
+.final p { color: rgba(255,255,255,.55); font-size: .975rem; margin-bottom: 38px; position: relative; }
+.final-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; position: relative; }
+
+/* ── FOOTER ── */
+footer { background: #020817; padding: 68px 64px 28px; }
+.ft { display: grid; grid-template-columns: 2.1fr 1fr 1fr 1fr 1fr; gap: 44px; margin-bottom: 52px; }
+.fb .logo { color: #fff; display: block; margin-bottom: 14px; }
+.fb p { font-size: .84rem; color: rgba(255,255,255,.36); line-height: 1.78; max-width: 250px; }
+.fb-soc { display: flex; gap: 9px; margin-top: 18px; }
+.soc { width: 34px; height: 34px; border-radius: 9px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.09); display: flex; align-items: center; justify-content: center; font-size: .82rem; color: rgba(255,255,255,.45); cursor: pointer; transition: all .2s; }
+.soc:hover { background: rgba(255,255,255,.11); color: #fff; }
+.fc h4 { font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.88); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px; }
+.fc ul { list-style: none; }
+.fc ul li { margin-bottom: 10px; }
+.fc ul li a { font-size: .83rem; color: rgba(255,255,255,.36); transition: color .2s; }
+.fc ul li a:hover { color: rgba(255,255,255,.88); }
+.fb-bottom { border-top: 1px solid rgba(255,255,255,.055); padding-top: 26px; display: flex; justify-content: space-between; }
+.fb-bottom span { font-size: .78rem; color: rgba(255,255,255,.28); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo">School<span>Hub</span></div>
+  <div class="nav-links">
+    <a href="#">Home</a><a href="#">Features</a><a href="#">Pricing</a><a href="#">About</a><a href="#">Contact</a>
+  </div>
+  <div class="nav-actions">
+    <a href="#" class="btn-ghost">Log In</a>
+    <a href="#" class="btn-cta">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-orb orb1"></div>
+  <div class="hero-orb orb2"></div>
+  <div class="hero-left">
+    <div class="eyebrow"><div class="pulse"></div><span>School Management Platform</span></div>
+    <h1>Modern School<br/>Management <span class="hl">Made<br/>Simple</span> for Schools</h1>
+    <p>Replace scattered spreadsheets, registers, and WhatsApp groups with a single intelligent platform — from admissions to graduation, beautifully managed.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-hero-primary">Start Free Trial →</a>
+      <a href="#" class="btn-hero-sec">▶ Watch Demo</a>
+    </div>
+    <div class="trust">
+      <div class="avatars"><div>MK</div><div>ST</div><div>JF</div><div>AB</div></div>
+      <p><strong>500+ schools</strong> already on SchoolHub</p>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="dash-shell">
+      <div class="dash-bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="dash-bar-title">SchoolHub — Bright Future Academy</span>
+      </div>
+      <div class="dash-body">
+        <div class="d-stats">
+          <div class="d-stat"><div class="v">1,248</div><div class="l">Students</div><div class="c">↑ +12 this week</div></div>
+          <div class="d-stat"><div class="v">96%</div><div class="l">Attendance</div><div class="c">↑ +2% vs last term</div></div>
+          <div class="d-stat"><div class="v">$24K</div><div class="l">Fees Collected</div><div class="c">↑ 82% of target</div></div>
+        </div>
+        <div class="d-chart">
+          <div class="d-chart-lbl">Monthly Attendance Rate</div>
+          <div class="chart-bars">
+            <div class="cb"><div class="cb-bar" style="height:64%"></div><span class="cb-lbl">Sep</span></div>
+            <div class="cb"><div class="cb-bar" style="height:76%"></div><span class="cb-lbl">Oct</span></div>
+            <div class="cb"><div class="cb-bar" style="height:58%"></div><span class="cb-lbl">Nov</span></div>
+            <div class="cb"><div class="cb-bar" style="height:84%"></div><span class="cb-lbl">Dec</span></div>
+            <div class="cb"><div class="cb-bar" style="height:70%"></div><span class="cb-lbl">Jan</span></div>
+            <div class="cb"><div class="cb-bar hi" style="height:96%"></div><span class="cb-lbl">Feb</span></div>
+            <div class="cb"><div class="cb-bar" style="height:87%"></div><span class="cb-lbl">Mar</span></div>
+          </div>
+        </div>
+        <div class="d-bottom">
+          <div class="d-card">
+            <div class="d-card-title">Recent Activity</div>
+            <div class="act-row"><div class="act-dot" style="background:#10b981"></div><span>Grade 10A marked</span></div>
+            <div class="act-row"><div class="act-dot" style="background:#3b82f6"></div><span>3 admissions approved</span></div>
+            <div class="act-row"><div class="act-dot" style="background:#f59e0b"></div><span>5 fee reminders sent</span></div>
+            <div class="act-row"><div class="act-dot" style="background:#8b5cf6"></div><span>Results uploaded</span></div>
+          </div>
+          <div class="d-card">
+            <div class="d-card-title">Fee Collection</div>
+            <div class="pr"><div class="pr-head"><span>Term Fees</span><span style="color:#10b981">82%</span></div><div class="pr-bar"><div class="pr-fill" style="width:82%;background:linear-gradient(90deg,#10b981,#34d399)"></div></div></div>
+            <div class="pr"><div class="pr-head"><span>Exam Fees</span><span style="color:#3b82f6">64%</span></div><div class="pr-bar"><div class="pr-fill" style="width:64%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div></div>
+            <div class="pr"><div class="pr-head"><span>Activities</span><span style="color:#f59e0b">41%</span></div><div class="pr-bar"><div class="pr-fill" style="width:41%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="m-item">🏫 Bright Future Academy</span><span class="m-item">📚 Monrovia International School</span><span class="m-item">🎓 New Vision Secondary</span><span class="m-item">🌟 Excel Academy</span><span class="m-item">📖 Pioneer High School</span><span class="m-item">🏆 Unity College</span><span class="m-item">✏️ Grace Christian School</span><span class="m-item">🎯 Future Leaders Academy</span>
+    <span class="m-item">🏫 Bright Future Academy</span><span class="m-item">📚 Monrovia International School</span><span class="m-item">🎓 New Vision Secondary</span><span class="m-item">🌟 Excel Academy</span><span class="m-item">📖 Pioneer High School</span><span class="m-item">🏆 Unity College</span><span class="m-item">✏️ Grace Christian School</span><span class="m-item">🎯 Future Leaders Academy</span>
+  </div>
+</div>
+
+<!-- CHALLENGES -->
+<section class="challenges">
+  <div class="tc reveal">
+    <div class="s-tag">The Problem</div>
+    <h2 class="s-title">The Challenges Schools Face Today</h2>
+    <p class="s-sub">School administrators spend hours drowning in paperwork instead of focusing on what truly matters — education.</p>
+  </div>
+  <div class="ch-grid">
+    <div class="ch-card reveal d1"><div class="ch-ico">📋</div><h3>Manual Record Keeping</h3><p>Paper-based registers, manual attendance logs, and scattered student files waste hours and lead to costly errors that damage your school's credibility.</p></div>
+    <div class="ch-card reveal d2"><div class="ch-ico">💸</div><h3>Disorganized Fee Management</h3><p>Tracking unpaid fees, issuing receipts manually, and generating financial reports is slow, error-prone, and stressful for both bursars and parents.</p></div>
+    <div class="ch-card reveal d3"><div class="ch-ico">📡</div><h3>Poor Parent Communication</h3><p>Sending timely updates about attendance, exam results, and events to hundreds of parents without a unified system is a constant operational challenge.</p></div>
+  </div>
+</section>
+
+<!-- SOLVE -->
+<div class="solve-wrap">
+  <div class="solve-box reveal">
+    <div class="solve-box-grid"></div>
+    <div class="solve-txt">
+      <div class="solve-pill">The Solution</div>
+      <h2>SchoolHub Solves All These —<br/>In <em>One Simple System</em></h2>
+      <p>Replace everything with a single intelligent platform. From the first application to the final report card, SchoolHub handles it all with elegance and speed.</p>
+      <a href="#" class="btn-w">Explore All Features →</a>
+    </div>
+    <div class="solve-widget-wrap">
+      <div class="sw">
+        <div class="sw-head"><span class="sw-title">📊 Live School Overview</span><span class="sw-live">● Live</span></div>
+        <div class="sw-row"><div class="sw-ico" style="background:rgba(59,130,246,.14)">👧</div><div class="sw-info"><div class="sn">Admissions</div><div class="ss">12 pending approval</div></div><span class="sw-tag" style="background:rgba(59,130,246,.14);color:#93c5fd">New</span></div>
+        <div class="sw-row"><div class="sw-ico" style="background:rgba(16,185,129,.14)">✅</div><div class="sw-info"><div class="sn">Attendance</div><div class="ss">All classes marked today</div></div><span class="sw-tag" style="background:rgba(16,185,129,.14);color:#6ee7b7">Done</span></div>
+        <div class="sw-row"><div class="sw-ico" style="background:rgba(245,158,11,.14)">💰</div><div class="sw-info"><div class="sn">Fee Alerts</div><div class="ss">8 overdue accounts</div></div><span class="sw-tag" style="background:rgba(245,158,11,.14);color:#fcd34d">Action</span></div>
+        <div class="sw-row"><div class="sw-ico" style="background:rgba(139,92,246,.14)">📨</div><div class="sw-info"><div class="sn">Messages Sent</div><div class="ss">234 parents notified</div></div><span class="sw-tag" style="background:rgba(139,92,246,.14);color:#c4b5fd">Sent</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY -->
+<section class="why">
+  <div class="tc reveal">
+    <div class="s-tag">Why SchoolHub</div>
+    <h2 class="s-title">Why Hundreds of Schools Choose Us</h2>
+    <p class="s-sub">Purpose-built for African schools. Affordable, offline-ready, and easy for anyone to use from day one.</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card reveal d1"><div class="why-ico">🚀</div><h3>Quick 30-Min Setup</h3><p>Get your school fully live in under 30 minutes. No technical expertise or IT department required.</p></div>
+    <div class="why-card reveal d2"><div class="why-ico">📱</div><h3>Works on Any Device</h3><p>Phone, tablet, or laptop — SchoolHub delivers a perfect, responsive experience on every screen.</p></div>
+    <div class="why-card reveal d3"><div class="why-ico">💰</div><h3>Transparent Pricing</h3><p>Simple, affordable plans built for African school budgets. No hidden fees, no surprises, ever.</p></div>
+    <div class="why-card reveal d4"><div class="why-ico">🔒</div><h3>Bank-Level Security</h3><p>AES-256 encryption, daily backups, and role-based access keep your school data always protected.</p></div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="who">
+  <div class="tc reveal">
+    <div class="s-tag">Who It's For</div>
+    <h2 class="s-title">Built for Every Role in Your School</h2>
+    <p class="s-sub">Whether you're a principal, teacher, or bursar — SchoolHub has the perfect tools tailored just for you.</p>
+  </div>
+  <div class="who-grid">
+    <div class="who-card reveal d1"><div class="wca"></div><div class="who-ico" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">🏫</div><h3>Principals & Admins</h3><div class="who-role">School leadership & management</div><ul class="who-ul"><li><div class="ck">✓</div>Full student & staff database</li><li><div class="ck">✓</div>Financial reports & analytics</li><li><div class="ck">✓</div>Academic performance overview</li><li><div class="ck">✓</div>School-wide announcements</li><li><div class="ck">✓</div>Timetable & class management</li></ul></div>
+    <div class="who-card reveal d2"><div class="wca"></div><div class="who-ico" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">📚</div><h3>Teachers & Registrars</h3><div class="who-role">Academic & records management</div><ul class="who-ul"><li><div class="ck">✓</div>Digital attendance marking</li><li><div class="ck">✓</div>Online grade & result entry</li><li><div class="ck">✓</div>Instant report card generation</li><li><div class="ck">✓</div>Lesson plan tracking</li><li><div class="ck">✓</div>Student progress notes</li></ul></div>
+    <div class="who-card reveal d3"><div class="wca"></div><div class="who-ico" style="background:linear-gradient(135deg,#fefce8,#fef9c3)">💳</div><h3>Bursary & Admissions</h3><div class="who-role">Finance & admissions management</div><ul class="who-ul"><li><div class="ck">✓</div>Online fee collection & receipts</li><li><div class="ck">✓</div>Admission form processing</li><li><div class="ck">✓</div>Fee outstanding reports</li><li><div class="ck">✓</div>Automatic payment reminders</li><li><div class="ck">✓</div>Enrollment status tracking</li></ul></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="feat-bg"></div><div class="feat-grid-bg"></div>
+  <div class="tc reveal" style="position:relative;z-index:1">
+    <div class="s-tag">Core Features</div>
+    <h2 class="s-title">Everything Your School Needs</h2>
+    <p class="s-sub">A complete, all-in-one toolkit for managing every aspect of your school's daily operations.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="f-card reveal d1"><div class="f-ico">👩‍🎓</div><h3>Student Admissions & Profiles</h3><p>Online applications, digital records, document uploads, and enrollment management in one streamlined flow.</p></div>
+    <div class="f-card reveal d2"><div class="f-ico">📅</div><h3>Attendance Tracking System</h3><p>Mark attendance by class or subject, auto-generate reports, and instantly notify parents of any absences.</p></div>
+    <div class="f-card reveal d3"><div class="f-ico">💳</div><h3>Advanced Fee Management</h3><p>Collect fees online, issue digital receipts instantly, set payment schedules, and track every single transaction.</p></div>
+    <div class="f-card reveal d1"><div class="f-ico">📝</div><h3>Exams & Result Management</h3><p>Create exams, enter scores, auto-calculate grades, and generate beautiful professional report cards in minutes.</p></div>
+    <div class="f-card reveal d2"><div class="f-ico">🗓️</div><h3>Timetable & Class Management</h3><p>Build and publish timetables, assign teachers, and automatically detect and resolve scheduling conflicts.</p></div>
+    <div class="f-card reveal d3"><div class="f-ico">📣</div><h3>Parent & Staff Communication</h3><p>Send targeted SMS, email, or in-app messages to parents, students, and staff from one simple dashboard.</p></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="tc reveal">
+    <div class="s-tag">How It Works</div>
+    <h2 class="s-title">Get Your School Running in 3 Steps</h2>
+    <p class="s-sub">Effortless onboarding, powerful outcomes. No IT department required.</p>
+  </div>
+  <div class="how-grid">
+    <div class="how-step reveal d1"><div class="step-n">1</div><h3>Register Your Account</h3><p>Sign up in minutes with your school's basic information. No setup fee, no credit card required.</p></div>
+    <div class="how-step reveal d2"><div class="step-n">2</div><h3>Set Up Your School System</h3><p>Add students, staff, and classes, then configure your fee structure using our guided setup wizard.</p></div>
+    <div class="how-step reveal d3"><div class="step-n">3</div><h3>Start Managing Digitally</h3><p>Go live and watch your school transform. Track everything in real-time from anywhere.</p></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="tc reveal">
+    <div class="s-tag">Pricing</div>
+    <h2 class="s-title">Simple, Transparent Pricing</h2>
+    <p class="s-sub">No hidden fees. No lock-in. Pick the plan that fits your school and scale as you grow.</p>
+  </div>
+  <div class="p-toggle">
+    <div class="p-toggle-wrap">
+      <div class="p-opt on" onclick="ptoggle(this,'m')">Monthly</div>
+      <div class="p-opt" onclick="ptoggle(this,'a')">Annual <span class="save-tag">Save 20%</span></div>
+    </div>
+  </div>
+  <div class="p-cards reveal">
+    <div class="p-card" onclick="psel(this)">
+      <div class="p-badge">⭐ Selected</div>
+      <div class="p-tier">Basic</div>
+      <div class="p-price"><span class="p-amt" data-m="70" data-a="56">$70</span><span class="p-per">/mo</span></div>
+      <p class="p-desc">For small schools up to 300 students</p>
+      <div class="p-div"></div>
+      <ul class="p-list"><li><span class="gc">✓</span>Up to 300 students</li><li><span class="gc">✓</span>5 staff accounts</li><li><span class="gc">✓</span>Attendance & grades</li><li><span class="gc">✓</span>Fee management</li><li><span class="gc">✓</span>Email support</li></ul>
+      <a href="#" class="p-btn">Get Started</a>
+    </div>
+    <div class="p-card sel" onclick="psel(this)">
+      <div class="p-badge">⭐ Most Popular</div>
+      <div class="p-tier">Standard</div>
+      <div class="p-price"><span class="p-amt" data-m="125" data-a="100">$125</span><span class="p-per">/mo</span></div>
+      <p class="p-desc">For medium schools up to 800 students</p>
+      <div class="p-div"></div>
+      <ul class="p-list"><li><span class="gc">✓</span>Up to 800 students</li><li><span class="gc">✓</span>20 staff accounts</li><li><span class="gc">✓</span>All Basic features</li><li><span class="gc">✓</span>SMS notifications</li><li><span class="gc">✓</span>Timetable management</li><li><span class="gc">✓</span>Priority support</li></ul>
+      <a href="#" class="p-btn">Get Started</a>
+    </div>
+    <div class="p-card" onclick="psel(this)">
+      <div class="p-badge">⭐ Selected</div>
+      <div class="p-tier">Premium</div>
+      <div class="p-price"><span class="p-amt" data-m="210" data-a="168">$210</span><span class="p-per">/mo</span></div>
+      <p class="p-desc">For large schools with unlimited students</p>
+      <div class="p-div"></div>
+      <ul class="p-list"><li><span class="gc">✓</span>Unlimited students</li><li><span class="gc">✓</span>Unlimited staff</li><li><span class="gc">✓</span>All Standard features</li><li><span class="gc">✓</span>Custom branding</li><li><span class="gc">✓</span>API access</li><li><span class="gc">✓</span>Dedicated account manager</li></ul>
+      <a href="#" class="p-btn">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRIAL BANNER -->
+<div class="trial-wrap">
+  <div class="trial-box reveal">
+    <h2>🎓 1 Academic Term Free Trial for All Schools</h2>
+    <p>No credit card. No commitment. Full access to every feature for your entire first term.</p>
+    <div class="trial-btns">
+      <a href="#" class="btn-hero-primary">Start Free Trial for Your School →</a>
+      <a href="#" class="btn-hero-sec">Schedule a Live Demo</a>
+    </div>
+    <div class="trial-perks">
+      <div class="tp"><span class="tpck">✓</span>Cancel anytime</div>
+      <div class="tp"><span class="tpck">✓</span>Free onboarding support</div>
+      <div class="tp"><span class="tpck">✓</span>All features included</div>
+      <div class="tp"><span class="tpck">✓</span>No hidden fees</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="tc reveal" style="position:relative;z-index:1">
+    <div class="s-tag" style="color:#93c5fd;--blue:#93c5fd">Our Impact</div>
+    <h2 class="s-title" style="color:#fff">Trusted by Growing Schools</h2>
+  </div>
+  <div class="stats-grid reveal">
+    <div class="stat-c"><div class="stat-n">500+</div><div class="stat-l">Schools Onboarded Across Africa</div></div>
+    <div class="stat-c"><div class="stat-n">10+</div><div class="stat-l">African Countries Served</div></div>
+    <div class="stat-c"><div class="stat-n">99%</div><div class="stat-l">Customer Satisfaction Rate</div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="tc reveal">
+    <div class="s-tag">Testimonials</div>
+    <h2 class="s-title">What Schools Are Saying</h2>
+    <p class="s-sub">Hear from the school leaders who use SchoolHub every single day.</p>
+  </div>
+  <div class="t-grid">
+    <div class="t-card reveal d1"><div class="t-stars">⭐⭐⭐⭐⭐</div><blockquote>"SchoolHub completely transformed our school management. Fee collection alone saves us 20 hours a month. I can't imagine going back to spreadsheets."</blockquote><div class="t-author"><div class="t-av">MK</div><div><div class="t-name">Mr. Konneh</div><div class="t-role">Principal, Bright Future Academy</div></div></div></div>
+    <div class="t-card reveal d2"><div class="t-stars">⭐⭐⭐⭐⭐</div><blockquote>"The parent communication feature is a game-changer. Parents always know what's happening, and our school's credibility has grown enormously."</blockquote><div class="t-author"><div class="t-av">ST</div><div><div class="t-name">Mrs. Togba</div><div class="t-role">Registrar, Monrovia International School</div></div></div></div>
+    <div class="t-card reveal d3"><div class="t-stars">⭐⭐⭐⭐⭐</div><blockquote>"Setting up was incredibly easy. Within a single day, our entire school was live on the platform. The support team is exceptionally responsive."</blockquote><div class="t-author"><div class="t-av">JF</div><div><div class="t-name">Mr. Freeman</div><div class="t-role">Director, New Vision Secondary School</div></div></div></div>
+  </div>
+</section>
+
+<!-- BUILT FOR -->
+<section class="built">
+  <div class="built-inner">
+    <div class="built-left reveal">
+      <div class="s-tag">Built Locally</div>
+      <h2 class="s-title">Built for <span style="color:var(--blue)">African Schools</span></h2>
+      <p class="s-sub">We understand the unique challenges schools in Africa face. SchoolHub is designed from the ground up with those realities at its core.</p>
+      <div class="b-feats">
+        <div class="b-feat"><div class="b-ico">📶</div><div class="b-txt"><h4>Works Offline</h4><p>Mark attendance without internet. Data syncs automatically when reconnected.</p></div></div>
+        <div class="b-feat"><div class="b-ico">💵</div><div class="b-txt"><h4>Local Payments</h4><p>Accept mobile money, bank transfers, and cash with instant digital receipts.</p></div></div>
+        <div class="b-feat"><div class="b-ico">🌍</div><div class="b-txt"><h4>Multi-Currency</h4><p>USD, Liberian Dollar, Naira, Cedis, and more African currencies fully supported.</p></div></div>
+        <div class="b-feat"><div class="b-ico">📞</div><div class="b-txt"><h4>Local Support</h4><p>Get help in your timezone from on-the-ground customer support teams.</p></div></div>
+      </div>
+    </div>
+    <div class="built-right reveal d2">
+      <div class="b-screen">
+        <div class="b-row">
+          <div class="b-stat"><div class="bv">847</div><div class="bl">Enrolled</div><div class="bc">↑ +23 this term</div></div>
+          <div class="b-stat"><div class="bv">94%</div><div class="bl">Pass Rate</div><div class="bc">↑ +6% vs last</div></div>
+          <div class="b-stat"><div class="bv">$18K</div><div class="bl">Revenue</div><div class="bc">↑ On track</div></div>
+        </div>
+        <div class="b-prog-sec">
+          <div class="b-prog-title">Top Performing Classes — Current Term</div>
+          <div class="bpr"><div class="bpr-head"><span>Grade 12A</span><span style="color:#10b981">92%</span></div><div class="bpr-bar"><div class="bpr-fill" style="width:92%"></div></div></div>
+          <div class="bpr"><div class="bpr-head"><span>Grade 11B</span><span style="color:#10b981">88%</span></div><div class="bpr-bar"><div class="bpr-fill" style="width:88%"></div></div></div>
+          <div class="bpr"><div class="bpr-head"><span>Grade 10C</span><span style="color:#10b981">85%</span></div><div class="bpr-bar"><div class="bpr-fill" style="width:85%"></div></div></div>
+          <div class="bpr"><div class="bpr-head"><span>Grade 9A</span><span style="color:#f59e0b">79%</span></div><div class="bpr-bar"><div class="bpr-fill" style="width:79%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="security">
+  <div class="sec-inner">
+    <div class="sec-vis reveal">
+      <div class="sec-c"><div class="sec-c-ico">🔐</div><h4>Encrypted Storage</h4><p>All data encrypted at rest with AES-256 — the same standard used by banks worldwide.</p></div>
+      <div class="sec-c"><div class="sec-c-ico">☁️</div><h4>Cloud Backups</h4><p>Automatic backups every 24 hours to redundant secure cloud servers in multiple locations.</p></div>
+      <div class="sec-c"><div class="sec-c-ico">👥</div><h4>Access Control</h4><p>Define exactly who sees what. Each role gets tailored permissions to keep sensitive data protected.</p></div>
+      <div class="sec-c"><div class="sec-c-ico">📱</div><h4>Two-Factor Auth</h4><p>Optional 2FA for all accounts adds a critical extra layer against unauthorized access attempts.</p></div>
+    </div>
+    <div class="sec-txt reveal d2">
+      <div class="s-tag">Data Security</div>
+      <h2 class="s-title">Your School Data is<br/>Safe With Us</h2>
+      <p class="s-sub">We take data protection with the utmost seriousness. Your school's information is encrypted, backed up daily, and never shared with anyone.</p>
+      <ul class="sec-list">
+        <li><div class="sec-li-ico">🔒</div>End-to-end AES-256 encryption</li>
+        <li><div class="sec-li-ico">💾</div>Daily automated backups</li>
+        <li><div class="sec-li-ico">📋</div>GDPR-compliant data handling</li>
+        <li><div class="sec-li-ico">👤</div>Role-based access control</li>
+        <li><div class="sec-li-ico">⚡</div>99.9% uptime SLA guarantee</li>
+        <li><div class="sec-li-ico">🛡️</div>Two-factor authentication (2FA)</li>
+      </ul>
+      <a href="#" class="btn-blue">Learn About Our Security →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="tc reveal">
+    <div class="s-tag">FAQ</div>
+    <h2 class="s-title">Frequently Asked Questions</h2>
+    <p class="s-sub">Everything you need to know before getting started with SchoolHub.</p>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item open"><div class="faq-q" onclick="faq(this)"><span>How long does it take to set up SchoolHub?</span><div class="faq-ico">+</div></div><div class="faq-ans">Most schools are fully set up and running within 30 to 60 minutes. Our guided wizard walks you through every step, and our onboarding team is available at no extra cost to assist you personally.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)"><span>Do I need technical knowledge to use SchoolHub?</span><div class="faq-ico">+</div></div><div class="faq-ans">No technical knowledge required. SchoolHub is designed for everyone — principals, teachers, and admin staff alike. If you can use a smartphone, you can use SchoolHub with total confidence.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)"><span>Can SchoolHub work without internet connectivity?</span><div class="faq-ico">+</div></div><div class="faq-ans">Yes! Key features including attendance marking and student record viewing work offline. Your data syncs automatically and securely to the cloud as soon as your connection is restored.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)"><span>What happens to my data after the free trial ends?</span><div class="faq-ico">+</div></div><div class="faq-ans">All your data is fully preserved. After your free academic term, simply choose a plan and continue. We'll send you reminders before your trial ends so you're never caught off guard.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)"><span>Can parents access SchoolHub to track their children?</span><div class="faq-ico">+</div></div><div class="faq-ans">Absolutely. Parents receive real-time notifications via SMS or email and can log into a dedicated parent portal to view attendance, results, fees, and school announcements.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="faq(this)"><span>Is my school's data private and completely secure?</span><div class="faq-ico">+</div></div><div class="faq-ans">Your data is AES-256 encrypted, backed up daily, and never sold or shared with any third party. You own your data completely and can export or delete it at any time you choose.</div></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final">
+  <h2>Ready to Digitize Your School? 🎓</h2>
+  <p>Join hundreds of schools already running smarter, faster, and better with SchoolHub.</p>
+  <div class="final-btns">
+    <a href="#" class="btn-hero-primary">Start Your Free Trial Today →</a>
+    <a href="#" class="btn-hero-sec">Talk to Our Team</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">
+    <div class="fb">
+      <span class="logo">School<span>Hub</span></span>
+      <p>The all-in-one school management platform built for African schools. Simple, affordable, and powerful.</p>
+      <div class="fb-soc"><div class="soc">𝕏</div><div class="soc">in</div><div class="soc">f</div><div class="soc">📧</div></div>
+    </div>
+    <div class="fc"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Pricing</a></li><li><a href="#">Changelog</a></li><li><a href="#">Roadmap</a></li></ul></div>
+    <div class="fc"><h4>Company</h4><ul><li><a href="#">About Us</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+    <div class="fc"><h4>Support</h4><ul><li><a href="#">Help Center</a></li><li><a href="#">Contact</a></li><li><a href="#">Community</a></li><li><a href="#">Status</a></li></ul></div>
+    <div class="fc"><h4>Legal</h4><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Use</a></li><li><a href="#">Cookie Policy</a></li><li><a href="#">GDPR</a></li></ul></div>
+  </div>
+  <div class="fb-bottom">
+    <span>© 2024 SchoolHub. All rights reserved.</span>
+    <span>Made with ❤️ for African Schools</span>
+  </div>
+</footer>
+
+<script>
+// Nav scroll
+window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY > 40));
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } }), { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// FAQ
+function faq(el) {
+  const item = el.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Pricing select
+function psel(card) {
+  document.querySelectorAll('.p-card').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+}
+
+// Pricing toggle
+let annual = false;
+function ptoggle(el, mode) {
+  document.querySelectorAll('.p-opt').forEach(o => o.classList.remove('on'));
+  el.classList.add('on');
+  annual = mode === 'a';
+  document.querySelectorAll('.p-amt').forEach(a => { a.textContent = '$' + (annual ? a.dataset.a : a.dataset.m); });
+}
+</script>
+</body>
+</html>
